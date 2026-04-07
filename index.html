@@ -16,7 +16,7 @@ body {
 /* ЭКРАНЫ */
 .screen {
     display:none;
-    padding-bottom:90px;
+    padding-bottom:140px;
 }
 .active {
     display:block;
@@ -28,52 +28,58 @@ body {
     margin:12px;
     padding:18px;
     border-radius:20px;
-    box-shadow:0 5px 15px rgba(0,0,0,0.4);
+    box-shadow:0 5px 15px rgba(0,0,0,0.5);
 }
 
-/* КНОПКИ (БОЛЬШИЕ) */
+/* КНОПКИ */
 button {
     width:100%;
-    padding:18px;
+    padding:20px;
     margin-top:12px;
     border:none;
-    border-radius:16px;
+    border-radius:18px;
     background: linear-gradient(135deg, #3b82f6, #2563eb);
     color:white;
-    font-size:18px;
+    font-size:20px;
     font-weight:bold;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.4);
-    transition: 0.2s;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
 }
 
 button:active {
-    transform: scale(0.97);
+    transform: scale(0.96);
 }
 
 /* INPUT */
 input {
     width:100%;
-    padding:14px;
+    padding:15px;
     border-radius:12px;
     border:none;
     margin-top:10px;
+    font-size:16px;
 }
 
-/* МЕНЮ */
+/* 🔥 ОГРОМНОЕ МЕНЮ */
 .navbar {
     position:fixed;
     bottom:0;
     width:100%;
     display:flex;
     background:#020617;
-    border-top:1px solid #1e293b;
+    border-top:2px solid #1e293b;
+    height:120px;
 }
 
 .navbar button {
     flex:1;
-    padding:18px;
-    font-size:20px;
+    font-size:26px;
+    font-weight:bold;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
     background:none;
+    padding:10px;
 }
 
 /* ВИДЕО */
@@ -94,7 +100,7 @@ input {
 <p>ID: <span id="user"></span></p>
 <p>Статус: <span id="status"></span></p>
 
-<button onclick="buyPro()" style="font-size:20px; padding:20px;">
+<button onclick="buyPro()">
 💎 КУПИТЬ PRO
 </button>
 </div>
@@ -103,7 +109,7 @@ input {
 <!-- ⚖️ ВЕС -->
 <div id="weightScreen" class="screen">
 <div class="card">
-<h3>⚖️ Вес</h3>
+<h3>⚖️ Ввод веса</h3>
 <input id="weight" placeholder="Введите вес">
 <button onclick="saveWeight()">Сохранить</button>
 </div>
@@ -135,12 +141,23 @@ input {
 </div>
 </div>
 
-<!-- 🔻 МЕНЮ -->
+<!-- 🔻 НИЖНЕЕ МЕНЮ -->
 <div class="navbar">
-<button onclick="openScreen('home')">🏠</button>
-<button onclick="openScreen('weightScreen')">⚖️</button>
-<button onclick="openScreen('workoutScreen')">💪</button>
-<button onclick="openScreen('aiScreen')">🤖</button>
+<button onclick="openScreen('home')">
+🏠<br>Главная
+</button>
+
+<button onclick="openScreen('weightScreen')">
+⚖️<br>Вес
+</button>
+
+<button onclick="openScreen('workoutScreen')">
+💪<br>Тренировки
+</button>
+
+<button onclick="openScreen('aiScreen')">
+🤖<br>AI
+</button>
 </div>
 
 <script>
@@ -154,13 +171,13 @@ document.getElementById("user").innerText = userId;
 
 let SERVER = "https://hemizygous-grainier-ava.ngrok-free.dev";
 
-/* ЭКРАНЫ */
+/* ПЕРЕКЛЮЧЕНИЕ */
 function openScreen(id) {
     document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
     document.getElementById(id).classList.add("active");
 }
 
-/* ПРО */
+/* PRO */
 async function checkPro() {
     let res = await fetch(SERVER + "/check_pro?user_id=" + userId);
     let data = await res.json();
@@ -169,7 +186,7 @@ async function checkPro() {
         data.pro ? "PRO 💎" : "FREE";
 }
 
-/* ВЕС */
+/* СОХРАНЕНИЕ ВЕСА */
 function saveWeight() {
     let w = document.getElementById("weight").value;
 
