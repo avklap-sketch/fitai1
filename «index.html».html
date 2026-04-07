@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FitAI</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body style="background:#111;color:white;text-align:center;font-family:Arial;">
+
+<h1>📊 График веса</h1>
+
+<input id="weight" placeholder="Вес">
+<button onclick="add()">Добавить</button>
+
+<canvas id="chart"></canvas>
+
+<script>
+let weights = JSON.parse(localStorage.getItem("weights") || "[]");
+
+function add() {
+    let w = document.getElementById("weight").value;
+    weights.push(w);
+    localStorage.setItem("weights", JSON.stringify(weights));
+    draw();
+}
+
+function draw() {
+    new Chart(document.getElementById("chart"), {
+        type: 'line',
+        data: {
+            labels: weights.map((_, i) => i + 1),
+            datasets: [{
+                label: 'Вес',
+                data: weights
+            }]
+        }
+    });
+}
+
+draw();
+</script>
+
+</body>
+</html>
