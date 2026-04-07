@@ -7,98 +7,141 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
-    body {
-        margin: 0;
-        font-family: -apple-system, Arial;
-        background: #0f172a;
-        color: white;
-    }
+body {
+    margin: 0;
+    font-family: -apple-system, Arial;
+    background: #0f172a;
+    color: white;
+}
 
-    .container {
-        padding: 20px;
-    }
+.header {
+    text-align: center;
+    padding: 20px;
+    font-size: 22px;
+    font-weight: bold;
+}
 
-    h1 {
-        text-align: center;
-        margin-top: 10px;
-    }
+.screen {
+    display: none;
+    padding: 20px;
+}
 
-    .card {
-        background: #1e293b;
-        border-radius: 20px;
-        padding: 20px;
-        margin-top: 20px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-    }
+.active {
+    display: block;
+}
 
-    .input {
-        width: 100%;
-        padding: 15px;
-        border-radius: 12px;
-        border: none;
-        margin-top: 10px;
-        font-size: 16px;
-    }
+.card {
+    background: #1e293b;
+    border-radius: 20px;
+    padding: 20px;
+    margin-top: 15px;
+}
 
-    .btn {
-        width: 100%;
-        padding: 18px;
-        border: none;
-        border-radius: 15px;
-        margin-top: 15px;
-        font-size: 16px;
-        font-weight: bold;
-    }
+.input {
+    width: 100%;
+    padding: 15px;
+    border-radius: 12px;
+    border: none;
+    margin-top: 10px;
+    font-size: 16px;
+}
 
-    .green { background: #22c55e; color: white; }
-    .blue { background: #3b82f6; color: white; }
-    .purple { background: #a855f7; color: white; }
+.btn {
+    width: 100%;
+    padding: 16px;
+    border-radius: 14px;
+    border: none;
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: bold;
+}
 
+.green { background: #22c55e; }
+.blue { background: #3b82f6; }
+.purple { background: #a855f7; }
+
+.nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    background: #1e293b;
+}
+
+.nav button {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    background: none;
+    color: white;
+    font-size: 14px;
+}
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="header">🏋️ FitAI</div>
 
-<h1>🏋️ FitAI</h1>
-
-<div class="card">
-    <h3>⚖️ Вес</h3>
-    <input id="weight" class="input" placeholder="Введите вес">
-    <button class="btn green" onclick="saveWeight()">Сохранить</button>
+<!-- ЭКРАН ВЕС -->
+<div id="home" class="screen active">
+    <div class="card">
+        <h3>⚖️ Вес</h3>
+        <input id="weight" class="input" placeholder="Введите вес">
+        <button class="btn green" onclick="saveWeight()">Сохранить</button>
+    </div>
 </div>
 
-<div class="card">
-    <h3>🍽 Питание</h3>
-    <button class="btn blue" onclick="sendData('food')">Открыть</button>
+<!-- ЭКРАН ПИТАНИЕ -->
+<div id="food" class="screen">
+    <div class="card">
+        <h3>🍽 Питание</h3>
+        <button class="btn blue" onclick="sendData('food')">
+            Получить рекомендации
+        </button>
+    </div>
 </div>
 
-<div class="card">
-    <h3>💪 Тренировки</h3>
-    <button class="btn purple" onclick="sendData('workout')">Открыть</button>
+<!-- ЭКРАН ТРЕНИРОВКИ -->
+<div id="workout" class="screen">
+    <div class="card">
+        <h3>💪 Тренировки</h3>
+        <button class="btn purple" onclick="sendData('workout')">
+            Получить программу
+        </button>
+    </div>
 </div>
 
+<!-- НИЖНЕЕ МЕНЮ -->
+<div class="nav">
+    <button onclick="show('home')">🏠</button>
+    <button onclick="show('food')">🍽</button>
+    <button onclick="show('workout')">💪</button>
 </div>
 
 <script>
-    let tg = window.Telegram.WebApp;
-    tg.expand();
+let tg = window.Telegram.WebApp;
+tg.expand();
 
-    function saveWeight() {
-        let weight = document.getElementById("weight").value;
+function show(screen) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screen).classList.add('active');
+}
 
-        if (!weight) {
-            alert("Введите вес");
-            return;
-        }
+function saveWeight() {
+    let weight = document.getElementById("weight").value;
 
-        tg.sendData("weight:" + weight);
+    if (!weight) {
+        alert("Введите вес");
+        return;
     }
 
-    function sendData(type) {
-        tg.sendData(type);
-    }
+    tg.sendData("weight:" + weight);
+}
+
+function sendData(type) {
+    tg.sendData(type);
+}
 </script>
 
 </body>
