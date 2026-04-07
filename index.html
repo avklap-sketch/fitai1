@@ -1,54 +1,85 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>FitAI</title>
+<meta charset="UTF-8">
+<title>FitAI</title>
 
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    <style>
-        body {
-            font-family: Arial;
-            text-align: center;
-            background: #f5f5f5;
-        }
+<style>
+    body {
+        margin: 0;
+        font-family: -apple-system, Arial;
+        background: #0f172a;
+        color: white;
+    }
 
-        h1 {
-            margin-top: 30px;
-        }
+    .container {
+        padding: 20px;
+    }
 
-        .btn {
-            display: block;
-            width: 80%;
-            margin: 15px auto;
-            padding: 20px;
-            font-size: 18px;
-            border: none;
-            border-radius: 15px;
-            background: #4CAF50;
-            color: white;
-        }
+    h1 {
+        text-align: center;
+        margin-top: 10px;
+    }
 
-        .input {
-            padding: 15px;
-            font-size: 18px;
-            width: 60%;
-            margin-top: 20px;
-        }
-    </style>
+    .card {
+        background: #1e293b;
+        border-radius: 20px;
+        padding: 20px;
+        margin-top: 20px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    }
+
+    .input {
+        width: 100%;
+        padding: 15px;
+        border-radius: 12px;
+        border: none;
+        margin-top: 10px;
+        font-size: 16px;
+    }
+
+    .btn {
+        width: 100%;
+        padding: 18px;
+        border: none;
+        border-radius: 15px;
+        margin-top: 15px;
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .green { background: #22c55e; color: white; }
+    .blue { background: #3b82f6; color: white; }
+    .purple { background: #a855f7; color: white; }
+
+</style>
 </head>
 
 <body>
 
+<div class="container">
+
 <h1>🏋️ FitAI</h1>
 
-<input id="weight" class="input" placeholder="Введите вес">
+<div class="card">
+    <h3>⚖️ Вес</h3>
+    <input id="weight" class="input" placeholder="Введите вес">
+    <button class="btn green" onclick="saveWeight()">Сохранить</button>
+</div>
 
-<button class="btn" onclick="saveWeight()">💾 Сохранить вес</button>
+<div class="card">
+    <h3>🍽 Питание</h3>
+    <button class="btn blue" onclick="sendData('food')">Открыть</button>
+</div>
 
-<button class="btn" onclick="sendData('food')">🍽 Питание</button>
+<div class="card">
+    <h3>💪 Тренировки</h3>
+    <button class="btn purple" onclick="sendData('workout')">Открыть</button>
+</div>
 
-<button class="btn" onclick="sendData('workout')">💪 Тренировки</button>
+</div>
 
 <script>
     let tg = window.Telegram.WebApp;
