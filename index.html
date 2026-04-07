@@ -5,196 +5,66 @@
 <title>FitAI</title>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body {
     margin: 0;
-    font-family: -apple-system, Arial;
+    font-family: Arial;
     background: #0f172a;
     color: white;
 }
 
-.header {
-    text-align: center;
-    padding: 15px;
-    font-size: 22px;
-    font-weight: bold;
-}
-
-.screen {
-    display: none;
-    padding: 15px;
-}
-
-.active { display: block; }
-
 .card {
     background: #1e293b;
-    border-radius: 20px;
+    margin: 10px;
+    padding: 15px;
+    border-radius: 15px;
+}
+
+button {
+    width: 100%;
     padding: 15px;
     margin-top: 10px;
-}
-
-.input {
-    width: 100%;
-    padding: 12px;
     border-radius: 10px;
     border: none;
-}
-
-.btn {
-    width: 100%;
-    padding: 14px;
-    border-radius: 12px;
-    border: none;
-    margin-top: 10px;
-    font-weight: bold;
-}
-
-.green { background: #22c55e; }
-.blue { background: #3b82f6; }
-.purple { background: #a855f7; }
-
-.nav {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    display: flex;
-    background: #1e293b;
-}
-
-.nav button {
-    flex: 1;
-    padding: 12px;
-    border: none;
-    background: none;
-    color: white;
-}
-
-.pro {
-    background: gold;
-    color: black;
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">🏋️ FitAI</div>
-
-<!-- ВЕС -->
-<div id="home" class="screen active">
-    <div class="card">
-        <h3>⚖️ Вес</h3>
-        <input id="weight" class="input" placeholder="Введите вес">
-        <button class="btn green" onclick="saveWeight()">Сохранить</button>
-    </div>
-
-    <div class="card">
-        <canvas id="chart"></canvas>
-    </div>
+<div class="card">
+    <h3>⚖️ Вес</h3>
+    <input id="weight" placeholder="Введите вес">
+    <button onclick="saveWeight()">Сохранить</button>
 </div>
 
-<!-- ПИТАНИЕ -->
-<div id="food" class="screen">
-    <div class="card">
-        <h3>🍽 Питание</h3>
-        <button class="btn blue" onclick="sendData('food')">
-            Получить рекомендации
-        </button>
-    </div>
+<div class="card">
+    <button onclick="send('food')">🍽 Питание</button>
+    <button onclick="send('workout')">💪 Тренировки</button>
 </div>
 
-<!-- ТРЕНИРОВКИ -->
-<div id="workout" class="screen">
-    <div class="card">
-        <h3>💪 Тренировки</h3>
-        <button class="btn purple" onclick="sendData('workout')">
-            Получить программу
-        </button>
-    </div>
-</div>
-
-<!-- ЛИЧНЫЙ КАБИНЕТ -->
-<div id="profile" class="screen">
-    <div class="card">
-        <h3>👤 Личный кабинет</h3>
-        <p>Статус: <span id="status">FREE</span></p>
-        <button class="btn pro" onclick="buyPro()">Купить PRO</button>
-    </div>
-
-    <div class="card">
-        <h3>📈 Прогресс</h3>
-        <p id="progress">Нет данных</p>
-    </div>
-</div>
-
-<!-- МЕНЮ -->
-<div class="nav">
-    <button onclick="show('home')">🏠</button>
-    <button onclick="show('food')">🍽</button>
-    <button onclick="show('workout')">💪</button>
-    <button onclick="show('profile')">👤</button>
+<div class="card">
+    <h3>👤 Статус: <span id="status">FREE</span></h3>
+    <button onclick="buyPro()">💎 Купить PRO</button>
 </div>
 
 <script>
 let tg = window.Telegram.WebApp;
 tg.expand();
 
-// --- ЭКРАНЫ ---
-function show(screen) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(screen).classList.add('active');
-}
-
 // --- ВЕС ---
-let weights = JSON.parse(localStorage.getItem("weights") || "[]");
-
 function saveWeight() {
     let w = document.getElementById("weight").value;
     if (!w) return alert("Введите вес");
 
-    weights.push(Number(w));
-    localStorage.setItem("weights", JSON.stringify(weights));
-
+    localStorage.setItem("weight", w);
     tg.sendData("weight:" + w);
-
-    updateChart();
-    updateProgress();
 }
 
-// --- ГРАФИК ---
-let chart;
-
-function updateChart() {
-    let ctx = document.getElementById("chart");
-
-    if (chart) chart.destroy();
-
-    chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: weights.map((_, i) => i + 1),
-            datasets: [{
-                label: 'Вес',
-                data: weights,
-                borderWidth: 2
-            }]
-        }
-    });
-}
-
-// --- ПРОГРЕСС ---
-function updateProgress() {
-    if (weights.length < 2) return;
-
-    let diff = weights[weights.length - 1] - weights[0];
-
-    document.getElementById("progress").innerText =
-        diff > 0
-        ? "📈 Набор: +" + diff + " кг"
-        : "📉 Снижение: " + diff + " кг";
+// --- ОТПРАВКА ---
+function send(type) {
+    tg.sendData(type);
 }
 
 // --- PRO ---
@@ -202,14 +72,14 @@ function buyPro() {
     tg.sendData("buy_pro");
 }
 
-// --- ОТПРАВКА ---
-function sendData(type) {
-    tg.sendData(type);
+// --- ПРОВЕРКА PRO (локально после оплаты)
+function checkPro() {
+    if (localStorage.getItem("pro") == "1") {
+        document.getElementById("status").innerText = "PRO 💎";
+    }
 }
 
-// загрузка
-updateChart();
-updateProgress();
+checkPro();
 </script>
 
 </body>
