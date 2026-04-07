@@ -3,35 +3,62 @@
 <head>
 <meta charset="UTF-8">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-body { background:#0f172a; color:white; font-family:Arial; }
-.card { background:#1e293b; padding:15px; margin:10px; border-radius:15px; }
-button { width:100%; padding:15px; margin-top:10px; }
+body {
+    background:#0f172a;
+    color:white;
+    font-family:Arial;
+    margin:0;
+}
+
+.card {
+    background:#1e293b;
+    padding:15px;
+    margin:10px;
+    border-radius:15px;
+}
+
+button {
+    width:100%;
+    padding:15px;
+    margin-top:10px;
+    border-radius:10px;
+    border:none;
+}
+
+input {
+    width:100%;
+    padding:10px;
+}
 </style>
 </head>
 
 <body>
 
 <div class="card">
+<h2>👤 Личный кабинет</h2>
+<p>ID: <span id="user"></span></p>
+<p>Статус: <span id="status">...</span></p>
+<button onclick="buyPro()">💎 Купить PRO</button>
+</div>
+
+<div class="card">
 <h3>⚖️ Вес</h3>
-<input id="weight">
+<input id="weight" placeholder="Введите вес">
 <button onclick="saveWeight()">Сохранить</button>
+</div>
+
+<div class="card">
+<h3>📈 График веса</h3>
+<canvas id="chart"></canvas>
 </div>
 
 <div class="card">
 <button onclick="send('food')">🍽 Питание</button>
 <button onclick="send('workout')">💪 Тренировки</button>
-</div>
-
-<div class="card">
-<h3>👤 Статус: <span id="status">...</span></h3>
-<button onclick="buyPro()">💎 Купить PRO</button>
-</div>
-
-<div class="card">
-<h3>📈 История веса</h3>
-<div id="weights"></div>
+<button onclick="askAI()">🤖 AI тренер</button>
 </div>
 
 <script>
@@ -39,7 +66,9 @@ let tg = window.Telegram.WebApp;
 tg.expand();
 
 let user = tg.initDataUnsafe.user;
-let userId = user ? user.id : null;
+let userId = user ? user.id : 1;
+
+document.getElementById("user").innerText = userId;
 
 let SERVER = "https://hemizygous-grainier-ava.ngrok-free.dev";
 
@@ -52,22 +81,43 @@ async function checkPro() {
         data.pro ? "PRO 💎" : "FREE";
 }
 
-// --- ВЕС ---
+// --- СОХРАНИТЬ ВЕС ---
 function saveWeight() {
     let w = document.getElementById("weight").value;
 
     fetch(SERVER + "/save_weight?user_id=" + userId + "&weight=" + w);
 
     tg.sendData("weight:" + w);
+
+    setTimeout(loadChart, 500);
 }
 
-// --- ИСТОРИЯ ---
-async function loadWeights() {
+// --- ГРАФИК ---
+let chart;
+
+async function loadChart() {
     let res = await fetch(SERVER + "/get_weights?user_id=" + userId);
     let data = await res.json();
 
-    document.getElementById("weights").innerText =
-        data.weights.join(" → ");
+    let ctx = document.getElementById("chart");
+
+    if (chart) chart.destroy();
+
+    chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.weights.map((_, i) => i + 1),
+            datasets: [{
+                label: 'Вес',
+                data: data.weights
+            }]
+        }
+    });
+}
+
+// --- AI ---
+function askAI() {
+    tg.sendData("ai");
 }
 
 // --- КНОПКИ ---
@@ -75,7 +125,7 @@ function send(t) { tg.sendData(t); }
 function buyPro() { tg.sendData("buy_pro"); }
 
 checkPro();
-loadWeights();
+loadChart();
 </script>
 
 </body>
