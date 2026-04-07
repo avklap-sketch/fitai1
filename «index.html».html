@@ -1,43 +1,113 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>FitAI</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta charset="UTF-8">
+<title>FitAI</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+body {
+    font-family: Arial;
+    background: #0f172a;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+button {
+    width: 90%;
+    padding: 15px;
+    margin: 10px;
+    font-size: 18px;
+    border-radius: 10px;
+    border: none;
+    background: #22c55e;
+    color: white;
+}
+
+input {
+    padding: 10px;
+    font-size: 18px;
+    width: 80%;
+    border-radius: 8px;
+    border: none;
+}
+
+.card {
+    background: #1e293b;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 15px;
+}
+</style>
 </head>
 
-<body style="background:#111;color:white;text-align:center;font-family:Arial;">
+<body>
 
-<h1>📊 График веса</h1>
+<h2>🔥 FitAI PRO</h2>
 
-<input id="weight" placeholder="Вес">
-<button onclick="add()">Добавить</button>
+<button onclick="showSection('workout')">💪 Тренировки</button>
+<button onclick="showSection('food')">🍽 Питание</button>
+<button onclick="showSection('weight')">⚖️ Вес</button>
 
-<canvas id="chart"></canvas>
+<div id="content"></div>
 
 <script>
-let weights = JSON.parse(localStorage.getItem("weights") || "[]");
+const tg = window.Telegram.WebApp;
+tg.expand();
 
-function add() {
-    let w = document.getElementById("weight").value;
-    weights.push(w);
-    localStorage.setItem("weights", JSON.stringify(weights));
-    draw();
+// 🔹 ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ
+function showSection(type) {
+    const content = document.getElementById("content");
+
+    if (type === "workout") {
+        content.innerHTML = `
+        <div class="card">
+        <h3>💪 Тренировка</h3>
+        Отжимания 3x10<br>
+        Приседания 3x15<br>
+        Планка 30 сек x3
+        </div>`;
+    }
+
+    if (type === "food") {
+        content.innerHTML = `
+        <div class="card">
+        <h3>🍽 Питание</h3>
+        Завтрак: яйца + овсянка<br>
+        Обед: курица + рис<br>
+        Ужин: творог
+        </div>`;
+    }
+
+    if (type === "weight") {
+        content.innerHTML = `
+        <div class="card">
+        <h3>⚖️ Вес</h3>
+        <input id="weightInput" type="number" placeholder="Введите вес">
+        <br><br>
+        <button onclick="saveWeight()">Сохранить</button>
+        </div>`;
+    }
 }
 
-function draw() {
-    new Chart(document.getElementById("chart"), {
-        type: 'line',
-        data: {
-            labels: weights.map((_, i) => i + 1),
-            datasets: [{
-                label: 'Вес',
-                data: weights
-            }]
-        }
-    });
-}
+// 🔹 СОХРАНЕНИЕ ВЕСА ЧЕРЕЗ TELEGRAM
+function saveWeight() {
+    const weight = document.getElementById("weightInput").value;
 
-draw();
+    if (!weight) {
+        alert("Введите вес");
+        return;
+    }
+
+    tg.sendData(JSON.stringify({
+        type: "weight",
+        value: weight
+    }));
+
+    alert("Отправлено в бота ✅");
+}
 </script>
 
 </body>
