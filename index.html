@@ -9,58 +9,74 @@
 body {
     margin:0;
     font-family: Arial;
-    background:#0f172a;
+    background: linear-gradient(180deg, #0f172a, #020617);
     color:white;
 }
 
-/* --- ЭКРАНЫ --- */
-.screen { display:none; padding-bottom:80px; }
-.active { display:block; }
+/* ЭКРАНЫ */
+.screen {
+    display:none;
+    padding-bottom:90px;
+}
+.active {
+    display:block;
+}
 
-/* --- КАРТОЧКИ --- */
+/* КАРТОЧКИ */
 .card {
     background:#1e293b;
-    margin:10px;
-    padding:15px;
+    margin:12px;
+    padding:18px;
     border-radius:20px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.4);
 }
 
-/* --- КНОПКИ --- */
+/* КНОПКИ (БОЛЬШИЕ) */
 button {
     width:100%;
-    padding:15px;
-    margin-top:10px;
+    padding:18px;
+    margin-top:12px;
     border:none;
-    border-radius:12px;
-    background:#3b82f6;
+    border-radius:16px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
     color:white;
+    font-size:18px;
+    font-weight:bold;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+    transition: 0.2s;
 }
 
-/* --- INPUT --- */
+button:active {
+    transform: scale(0.97);
+}
+
+/* INPUT */
 input {
     width:100%;
-    padding:10px;
-    border-radius:10px;
+    padding:14px;
+    border-radius:12px;
+    border:none;
+    margin-top:10px;
 }
 
-/* --- МЕНЮ --- */
+/* МЕНЮ */
 .navbar {
     position:fixed;
     bottom:0;
     width:100%;
     display:flex;
     background:#020617;
+    border-top:1px solid #1e293b;
 }
 
 .navbar button {
     flex:1;
-    padding:15px;
+    padding:18px;
+    font-size:20px;
     background:none;
-    color:white;
-    border:none;
 }
 
-/* --- ВИДЕО --- */
+/* ВИДЕО */
 .video {
     width:100%;
     border-radius:15px;
@@ -71,13 +87,16 @@ input {
 
 <body>
 
-<!-- 👤 КАБИНЕТ -->
+<!-- 👤 ГЛАВНАЯ -->
 <div id="home" class="screen active">
 <div class="card">
-<h3>👤 Личный кабинет</h3>
+<h2>👤 Личный кабинет</h2>
 <p>ID: <span id="user"></span></p>
 <p>Статус: <span id="status"></span></p>
-<button onclick="buyPro()">💎 Купить PRO</button>
+
+<button onclick="buyPro()" style="font-size:20px; padding:20px;">
+💎 КУПИТЬ PRO
+</button>
 </div>
 </div>
 
@@ -85,12 +104,12 @@ input {
 <div id="weightScreen" class="screen">
 <div class="card">
 <h3>⚖️ Вес</h3>
-<input id="weight">
+<input id="weight" placeholder="Введите вес">
 <button onclick="saveWeight()">Сохранить</button>
 </div>
 
 <div class="card">
-<h3>📈 График</h3>
+<h3>📈 Прогресс</h3>
 <canvas id="chart"></canvas>
 </div>
 </div>
@@ -98,14 +117,13 @@ input {
 <!-- 💪 ТРЕНИРОВКИ -->
 <div id="workoutScreen" class="screen">
 <div class="card">
-<h3>💪 Программы</h3>
+<h3>💪 Программы тренировок</h3>
 
 <button onclick="showProgram('home')">🏠 Дом</button>
 <button onclick="showProgram('gym')">🏋️ Зал</button>
 <button onclick="showProgram('fat')">🔥 Снижение веса</button>
 
 <div id="program"></div>
-
 </div>
 </div>
 
@@ -136,13 +154,13 @@ document.getElementById("user").innerText = userId;
 
 let SERVER = "https://hemizygous-grainier-ava.ngrok-free.dev";
 
-/* --- ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ --- */
+/* ЭКРАНЫ */
 function openScreen(id) {
     document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
     document.getElementById(id).classList.add("active");
 }
 
-/* --- ПРО --- */
+/* ПРО */
 async function checkPro() {
     let res = await fetch(SERVER + "/check_pro?user_id=" + userId);
     let data = await res.json();
@@ -151,7 +169,7 @@ async function checkPro() {
         data.pro ? "PRO 💎" : "FREE";
 }
 
-/* --- ВЕС --- */
+/* ВЕС */
 function saveWeight() {
     let w = document.getElementById("weight").value;
 
@@ -162,7 +180,7 @@ function saveWeight() {
     setTimeout(loadChart, 500);
 }
 
-/* --- ГРАФИК --- */
+/* ГРАФИК */
 let chart;
 
 async function loadChart() {
@@ -179,26 +197,27 @@ async function loadChart() {
             labels: data.weights.map((_, i) => i + 1),
             datasets: [{
                 label: 'Вес',
-                data: data.weights
+                data: data.weights,
+                borderWidth: 3
             }]
         }
     });
 }
 
-/* --- ПРОГРАММЫ --- */
+/* ПРОГРАММЫ */
 function showProgram(type) {
     let p = document.getElementById("program");
 
     if (type === "home") {
         p.innerHTML = `
-        <h4>Дом</h4>
+        <h4>Домашняя тренировка</h4>
         <iframe class="video" src="https://www.youtube.com/embed/UItWltVZZmE"></iframe>
         `;
     }
 
     if (type === "gym") {
         p.innerHTML = `
-        <h4>Зал</h4>
+        <h4>Тренировка в зале</h4>
         <iframe class="video" src="https://www.youtube.com/embed/2pLT-olgUJs"></iframe>
         `;
     }
@@ -211,11 +230,11 @@ function showProgram(type) {
     }
 }
 
-/* --- КНОПКИ --- */
+/* КНОПКИ */
 function send(t) { tg.sendData(t); }
 function buyPro() { tg.sendData("buy_pro"); }
 
-/* --- PUSH (через бота) --- */
+/* PUSH */
 setInterval(() => {
     tg.sendData("reminder");
 }, 60000);
