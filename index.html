@@ -5,6 +5,7 @@
 <title>FitAI</title>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body {
@@ -16,43 +17,38 @@ body {
 
 .header {
     text-align: center;
-    padding: 20px;
+    padding: 15px;
     font-size: 22px;
     font-weight: bold;
 }
 
 .screen {
     display: none;
-    padding: 20px;
+    padding: 15px;
 }
 
-.active {
-    display: block;
-}
+.active { display: block; }
 
 .card {
     background: #1e293b;
     border-radius: 20px;
-    padding: 20px;
-    margin-top: 15px;
+    padding: 15px;
+    margin-top: 10px;
 }
 
 .input {
     width: 100%;
-    padding: 15px;
-    border-radius: 12px;
+    padding: 12px;
+    border-radius: 10px;
     border: none;
-    margin-top: 10px;
-    font-size: 16px;
 }
 
 .btn {
     width: 100%;
-    padding: 16px;
-    border-radius: 14px;
+    padding: 14px;
+    border-radius: 12px;
     border: none;
     margin-top: 10px;
-    font-size: 16px;
     font-weight: bold;
 }
 
@@ -70,11 +66,15 @@ body {
 
 .nav button {
     flex: 1;
-    padding: 15px;
+    padding: 12px;
     border: none;
     background: none;
     color: white;
-    font-size: 14px;
+}
+
+.pro {
+    background: gold;
+    color: black;
 }
 </style>
 </head>
@@ -83,16 +83,20 @@ body {
 
 <div class="header">🏋️ FitAI</div>
 
-<!-- ЭКРАН ВЕС -->
+<!-- ВЕС -->
 <div id="home" class="screen active">
     <div class="card">
         <h3>⚖️ Вес</h3>
         <input id="weight" class="input" placeholder="Введите вес">
         <button class="btn green" onclick="saveWeight()">Сохранить</button>
     </div>
+
+    <div class="card">
+        <canvas id="chart"></canvas>
+    </div>
 </div>
 
-<!-- ЭКРАН ПИТАНИЕ -->
+<!-- ПИТАНИЕ -->
 <div id="food" class="screen">
     <div class="card">
         <h3>🍽 Питание</h3>
@@ -102,7 +106,7 @@ body {
     </div>
 </div>
 
-<!-- ЭКРАН ТРЕНИРОВКИ -->
+<!-- ТРЕНИРОВКИ -->
 <div id="workout" class="screen">
     <div class="card">
         <h3>💪 Тренировки</h3>
@@ -112,36 +116,100 @@ body {
     </div>
 </div>
 
-<!-- НИЖНЕЕ МЕНЮ -->
+<!-- ЛИЧНЫЙ КАБИНЕТ -->
+<div id="profile" class="screen">
+    <div class="card">
+        <h3>👤 Личный кабинет</h3>
+        <p>Статус: <span id="status">FREE</span></p>
+        <button class="btn pro" onclick="buyPro()">Купить PRO</button>
+    </div>
+
+    <div class="card">
+        <h3>📈 Прогресс</h3>
+        <p id="progress">Нет данных</p>
+    </div>
+</div>
+
+<!-- МЕНЮ -->
 <div class="nav">
     <button onclick="show('home')">🏠</button>
     <button onclick="show('food')">🍽</button>
     <button onclick="show('workout')">💪</button>
+    <button onclick="show('profile')">👤</button>
 </div>
 
 <script>
 let tg = window.Telegram.WebApp;
 tg.expand();
 
+// --- ЭКРАНЫ ---
 function show(screen) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(screen).classList.add('active');
 }
 
+// --- ВЕС ---
+let weights = JSON.parse(localStorage.getItem("weights") || "[]");
+
 function saveWeight() {
-    let weight = document.getElementById("weight").value;
+    let w = document.getElementById("weight").value;
+    if (!w) return alert("Введите вес");
 
-    if (!weight) {
-        alert("Введите вес");
-        return;
-    }
+    weights.push(Number(w));
+    localStorage.setItem("weights", JSON.stringify(weights));
 
-    tg.sendData("weight:" + weight);
+    tg.sendData("weight:" + w);
+
+    updateChart();
+    updateProgress();
 }
 
+// --- ГРАФИК ---
+let chart;
+
+function updateChart() {
+    let ctx = document.getElementById("chart");
+
+    if (chart) chart.destroy();
+
+    chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: weights.map((_, i) => i + 1),
+            datasets: [{
+                label: 'Вес',
+                data: weights,
+                borderWidth: 2
+            }]
+        }
+    });
+}
+
+// --- ПРОГРЕСС ---
+function updateProgress() {
+    if (weights.length < 2) return;
+
+    let diff = weights[weights.length - 1] - weights[0];
+
+    document.getElementById("progress").innerText =
+        diff > 0
+        ? "📈 Набор: +" + diff + " кг"
+        : "📉 Снижение: " + diff + " кг";
+}
+
+// --- PRO ---
+function buyPro() {
+    tg.sendData("buy_pro");
+}
+
+// --- ОТПРАВКА ---
 function sendData(type) {
     tg.sendData(type);
 }
+
+// загрузка
+updateChart();
+updateProgress();
 </script>
 
 </body>
