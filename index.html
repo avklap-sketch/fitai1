@@ -1,9 +1,74 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>FitAI</title>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            background: #f5f5f5;
+        }
+
+        h1 {
+            margin-top: 30px;
+        }
+
+        .btn {
+            display: block;
+            width: 80%;
+            margin: 15px auto;
+            padding: 20px;
+            font-size: 18px;
+            border: none;
+            border-radius: 15px;
+            background: #4CAF50;
+            color: white;
+        }
+
+        .input {
+            padding: 15px;
+            font-size: 18px;
+            width: 60%;
+            margin-top: 20px;
+        }
+    </style>
 </head>
+
 <body>
-    <h1>Сайт работает 🚀</h1>
+
+<h1>🏋️ FitAI</h1>
+
+<input id="weight" class="input" placeholder="Введите вес">
+
+<button class="btn" onclick="saveWeight()">💾 Сохранить вес</button>
+
+<button class="btn" onclick="sendData('food')">🍽 Питание</button>
+
+<button class="btn" onclick="sendData('workout')">💪 Тренировки</button>
+
+<script>
+    let tg = window.Telegram.WebApp;
+    tg.expand();
+
+    function saveWeight() {
+        let weight = document.getElementById("weight").value;
+
+        if (!weight) {
+            alert("Введите вес");
+            return;
+        }
+
+        tg.sendData("weight:" + weight);
+    }
+
+    function sendData(type) {
+        tg.sendData(type);
+    }
+</script>
+
 </body>
 </html>
