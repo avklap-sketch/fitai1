@@ -7,40 +7,68 @@
 
 <style>
 body {
-    background:#0f172a;
-    color:white;
-    font-family:Arial;
     margin:0;
+    font-family: Arial;
+    background: linear-gradient(180deg, #0f172a, #020617);
+    color:white;
+}
+
+.header {
+    padding:20px;
+    font-size:22px;
+    font-weight:bold;
 }
 
 .card {
     background:#1e293b;
-    padding:15px;
     margin:10px;
-    border-radius:15px;
+    padding:15px;
+    border-radius:20px;
+    box-shadow:0 0 10px rgba(0,0,0,0.3);
 }
 
 button {
     width:100%;
     padding:15px;
     margin-top:10px;
-    border-radius:10px;
     border:none;
+    border-radius:12px;
+    background:#3b82f6;
+    color:white;
+    font-size:16px;
 }
 
 input {
     width:100%;
-    padding:10px;
+    padding:12px;
+    border-radius:10px;
+    border:none;
+}
+
+.pro {
+    color: gold;
+}
+
+.free {
+    color: #9ca3af;
+}
+
+.video {
+    width:100%;
+    border-radius:15px;
+    margin-top:10px;
 }
 </style>
 </head>
 
 <body>
 
+<div class="header">🏋️ FitAI</div>
+
 <div class="card">
-<h2>👤 Личный кабинет</h2>
+<h3>👤 Личный кабинет</h3>
 <p>ID: <span id="user"></span></p>
-<p>Статус: <span id="status">...</span></p>
+<p>Статус: <span id="status"></span></p>
 <button onclick="buyPro()">💎 Купить PRO</button>
 </div>
 
@@ -51,14 +79,22 @@ input {
 </div>
 
 <div class="card">
-<h3>📈 График веса</h3>
+<h3>📈 Прогресс</h3>
 <canvas id="chart"></canvas>
 </div>
 
 <div class="card">
+<h3>💪 Тренировки</h3>
+
+<button onclick="showVideos()">Показать тренировки</button>
+
+<div id="videos"></div>
+</div>
+
+<div class="card">
 <button onclick="send('food')">🍽 Питание</button>
-<button onclick="send('workout')">💪 Тренировки</button>
-<button onclick="askAI()">🤖 AI тренер</button>
+<button onclick="send('workout')">💪 План тренировок</button>
+<button onclick="send('ai')">🤖 AI тренер</button>
 </div>
 
 <script>
@@ -77,11 +113,18 @@ async function checkPro() {
     let res = await fetch(SERVER + "/check_pro?user_id=" + userId);
     let data = await res.json();
 
-    document.getElementById("status").innerText =
-        data.pro ? "PRO 💎" : "FREE";
+    let status = document.getElementById("status");
+
+    if (data.pro) {
+        status.innerText = "PRO 💎";
+        status.className = "pro";
+    } else {
+        status.innerText = "FREE";
+        status.className = "free";
+    }
 }
 
-// --- СОХРАНИТЬ ВЕС ---
+// --- ВЕС ---
 function saveWeight() {
     let w = document.getElementById("weight").value;
 
@@ -109,15 +152,21 @@ async function loadChart() {
             labels: data.weights.map((_, i) => i + 1),
             datasets: [{
                 label: 'Вес',
-                data: data.weights
+                data: data.weights,
+                borderWidth: 3
             }]
         }
     });
 }
 
-// --- AI ---
-function askAI() {
-    tg.sendData("ai");
+// --- ВИДЕО ---
+function showVideos() {
+    let v = document.getElementById("videos");
+
+    v.innerHTML = `
+        <iframe class="video" src="https://www.youtube.com/embed/UItWltVZZmE"></iframe>
+        <iframe class="video" src="https://www.youtube.com/embed/2pLT-olgUJs"></iframe>
+    `;
 }
 
 // --- КНОПКИ ---
